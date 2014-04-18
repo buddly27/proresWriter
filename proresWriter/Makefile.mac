@@ -1,0 +1,25 @@
+NDKDIR ?= ...
+FFMEGDIR ?= ...
+
+MYCXX ?= g++-4.1
+LINK ?= g++-4.1
+
+
+CXXFLAGS ?= -g -c -DUSE_GLEW -fPIC -msse \
+            -fvisibility=hidden \
+            -I$(NDKDIR)/Contents/MacOS/include \
+            -I$(FFMEGDIR)/include \
+            -I./include
+
+LINKFLAGS ?= -L$(NDKDIR)/Contents/MacOS -L$(FFMEGDIR)/lib -shared
+LIBS ?= -lDDImage -lavformat -lavcodec -lswscale -lavutil
+
+all: proresWriter.dylib
+.PRECIOUS : proresWriter.o
+
+proresWriter.o: src/proresWriter.cpp
+	$(MYCXX) $(CXXFLAGS) -o $(@) $<
+proresWriter.dylib: proresWriter.o
+	$(LINK) $(LINKFLAGS) $(LIBS) -o $(@) $<
+clean:
+	rm -f *.o *.dylib
